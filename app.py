@@ -91,12 +91,13 @@ def process_pdf(file):
 
 def retrieve_context(query: str, top_k: int = 3):
     query_vector = get_embedding(query)
-    results = client.search(
+    # Updated to query_points to support modern qdrant-client versions
+    response = client.query_points(
         collection_name=COLLECTION_NAME,
-        query_vector=query_vector,
+        query=query_vector,
         limit=top_k
     )
-    context = "\n\n".join([hit.payload["text"] for hit in results])
+    context = "\n\n".join([hit.payload["text"] for hit in response.points])
     return context
 
 def ask_ollama(query: str, context: str):
